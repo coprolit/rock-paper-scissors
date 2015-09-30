@@ -1,0 +1,22 @@
+//
+   Created by philippe_simpson on 29/09/15.
+
+extends layout
+
+block content
+   div(class='game')
+      h3(id='waiting') Waiting for opponent...
+
+      div(id='ready')
+         h1 You
+
+         div choose weapon
+         p
+         button(id = 'rock', type = 'button') Rock
+         button(id = 'paper', type = 'button') Paper
+            button(id = 'scissors', type = 'button') Scissors
+
+      p(id = 'messages')
+
+   script(src = "/javascripts/socket.io.js")
+   script(src = "/javascripts/game-client.js")

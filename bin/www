@@ -1,0 +1,252 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('rock-paper-scissors:server');
+var http = require('http');
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '3000');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+var server = http.createServer(app);
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+    var port = parseInt(val, 10);
+
+    if (isNaN(port)) {
+        // named pipe
+        return val;
+    }
+
+    if (port >= 0) {
+        // port number
+        return port;
+    }
+
+    return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+    if (error.syscall !== 'listen') {
+        throw error;
+    }
+
+    var bind = typeof port === 'string'
+        ? 'Pipe ' + port
+        : 'Port ' + port;
+
+    // handle specific listen errors with friendly messages
+    switch (error.code) {
+        case 'EACCES':
+            console.error(bind + ' requires elevated privileges');
+            process.exit(1);
+            break;
+        case 'EADDRINUSE':
+            console.error(bind + ' is already in use');
+            process.exit(1);
+            break;
+        default:
+            throw error;
+    }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+    var addr = server.address();
+    var bind = typeof addr === 'string'
+        ? 'pipe ' + addr
+        : 'port ' + addr.port;
+    debug('Listening on ' + bind);
+}
+
+/**
+ * Initialize an instance of socket.io by passing the HTTP server object
+ */
+var io = require('socket.io')(server);
+
+io.on('connection', function (socket) {
+    // socket represents an individual player
+
+    var name = registerPlayer(socket.id);
+
+    if(name){ // player was successfully registered
+        //socket.broadcast.emit('result', name + ' connected'); // broadcast to other users
+        //socket.emit('result', 'choose your weapon ' + name);
+
+        socket.on('disconnect', function () {
+            socket.broadcast.emit('result', name + ' disconnected'); // broadcast to other users
+            unregisterPlayer(socket.id);
+        });
+
+        socket.on('choice', function (val) {
+            socket.emit('result', "you chose " + val);
+            socket.broadcast.emit('result', name + ' has chosen'); // broadcast to other users
+            setChoice(socket.id, val);
+        });
+    } else {
+        socket.emit('result', 'Sorry, game is already full.');
+    }
+});
+
+/**
+ * Game Logic
+ */
+/*
+ var players = [
+ {
+ name: "Player 1",
+ id: null,
+ weapon: null
+ },
+ {
+ name: "Player 2",
+ id: null,
+ weapon: null
+ }];
+ */
+var round = 1;
+
+var player1 = {
+    name: "Player 1",
+    id: null,
+    weapon: null
+};
+var player2 = {
+    name: "Player 2",
+    id: null,
+    weapon: null
+};
+
+var players = [player1, player2];
+
+Object.observe(player1, function (changes) {
+    if (changes[0].name === 'weapon') resolveDuel();
+    if (changes[0].name === 'id') onRegistered();
+});
+Object.observe(player2, function (changes) {
+    if (changes[0].name === 'weapon') resolveDuel();
+    if (changes[0].name === 'id') onRegistered();
+});
+
+function onRegistered(){
+    if(player1.id && player2.id) io.emit('ready');
+}
+
+function registerPlayer(id) {
+    var name;
+    // abuse arr.some() because it's more compact than a for() loop:
+    players.some(function(element){ // tests whether some element in the array passes the test
+        if(element.id === null){
+            element.id = id;
+            name = element.name;
+            return true; // passed the test
+        }
+    }); // arr.some() breaks the loop and returns true if callback function returns true - but we have no use for it...
+    return name;
+}
+function unregisterPlayer(id) {
+    // abuse arr.some() because it's more compact than a for() loop:
+    players.some(function(element){ // tests whether some element in the array passes the test
+        if(element.id === id){
+            element.id = null;
+            //element.name = null;
+            return true; // passed the test, break out of the loop
+        }
+    }); // arr.some() returns true if callback function returns true - but we have no use for it...
+}
+
+function setChoice(id, val) {
+    // find player, then assign weapon choice:
+    players.forEach(function(element){
+        if(element.id === id) element.weapon = val;
+    });
+}
+
+function fight(player1, player2){
+    var weapon1 = player1.weapon,
+        weapon2 = player2.weapon;
+
+    if(weapon1 === weapon2) return null;
+
+    // return winner:
+
+    if(weapon1 === "rock"){
+        if(weapon2 === "paper"){
+            io.emit('result', "paper beats rock");
+            return player2;
+        }
+        if(weapon2 === "scissors"){
+            io.emit('result', "rock beats scissors");
+            return player1;
+        }
+    }
+
+    if(weapon1 === "paper"){
+        if(weapon2 === "rock"){
+            io.emit('result', "paper beats rock");
+            return player1;
+        }
+        if(weapon2 === "scissors"){
+            io.emit('result', "scissors beats paper");
+            return player2;
+        }
+    }
+
+    if(weapon1 === "scissors"){
+        if(weapon2 === "rock"){
+            io.emit('result', "rock beats scissors");
+            return player2;
+        }
+        if(weapon2 === "paper"){
+            io.emit('result', "scissors beats paper");
+            return player1;
+        }
+    }
+}
+
+function resolveDuel() {
+    if (player1.weapon && player2.weapon) {
+
+        io.emit('result', "Player 1 chose " + player1.weapon + " - Player 2 chose " + player2.weapon);
+
+        var winner = fight(player1, player2);
+
+        if(winner){
+            var msg = winner.name + " won!";
+            io.emit('result', msg);
+        } else {
+            io.emit('result', "Tie");
+        }
+
+        player1.weapon = player2.weapon = null; // reset weapon choices
+    }
+}
