@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <link rel='stylesheet' href="css/style.css" />
+</head>
+<body>
+    <p id="messages">
+
+    </p>
+
+    <div class="container">
+        <div id="frontView">
+            <div id="front">
+                <div>Welcome to</div>
+                <h1>Rock-paper-scissors</h1>
+                <img src='images/Rock-paper-scissors.svg' width='300' height='287'>
+                <p>
+                    <button id="start">start game</button>
+                </p>
+            </div>
+        </div>
+
+        <div id="waitView" class="hide">
+            <div id='wait'>
+                <h3>
+                    Waiting for opponent...
+                </h3>
+            </div>
+        </div>
+
+        <div id="gameView"  class='hide'>
+            <div id='game'>
+                <div>
+                    <h1>You</h1>
+                    <p id="weaponYou"></p>
+
+                    <h5>choose weapon</h5>
+                    <p>
+                        <button id="rock" type="button">Rock</button>
+                        <button id="paper" type="button">Paper</button>
+                        <button id="scissors" type="button">Scissors</button>
+                    </p>
+                </div>
+                <div>
+                    <h1>Opponent</h1>
+                    <p id="weaponOpponent"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p id="score"></p>
+
+    <script src="js/socket.io.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
