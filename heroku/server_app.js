@@ -88,7 +88,7 @@ io.on('connection', function (socket) {
             //socket.emit('result', 'choose your weapon ' + name);
 
             socket.on('disconnect', function () {
-                socket.broadcast.emit('message', name + ' disconnected'); // broadcast to other users
+                socket.broadcast.emit('mandown'); // broadcast to other users
                 unregisterPlayer(socket.id);
             });
 
@@ -137,6 +137,8 @@ var player2 = {
 
 var players = [player1, player2];
 
+var round = 0;
+
 Object.observe(player1, function (changes) {
     if (changes[0].name === 'weapon') resolveDuel();
     if (changes[0].name === 'id') onRegistered();
@@ -166,11 +168,14 @@ function unregisterPlayer(id) {
     players.some(function(element){ // tests whether some element in the array passes the test
         if(element.id === id){
             element.id = null;
-            element.wins = 0;
+            //element.wins = 0;
             //element.name = null;
             return true; // passed the test, break out of the loop
         }
     }); // arr.some() returns true if callback function returns true - but we have no use for it...
+
+    player1.wins = player2.wins = 0;
+    round = 0;
 }
 
 function setChoice(id, val) {
@@ -183,60 +188,50 @@ function fight(player1, player2){
     var weapon1 = player1.weapon,
         weapon2 = player2.weapon;
 
-    if(weapon1 === weapon2) return null;
+    if(weapon1 === weapon2) return {msg: "Tie"};
 
-    // return winner:
+    // return result:
 
     if(weapon1 === "rock"){
         if(weapon2 === "paper"){
-            io.emit('message', "paper beats rock");
-            return player2;
+            return {winner: player2, looser: player1, msg: "paper beats rock"};
         }
         if(weapon2 === "scissors"){
-            io.emit('message', "rock beats scissors");
-            return player1;
+            return {winner: player1, looser: player2, msg: "rock beats scissors"};
         }
     }
 
     if(weapon1 === "paper"){
         if(weapon2 === "rock"){
-            io.emit('message', "paper beats rock");
-            return player1;
+            return {winner: player1, looser: player2, msg: "paper beats rock"};
         }
         if(weapon2 === "scissors"){
-            io.emit('message', "scissors beats paper");
-            return player2;
+            return {winner: player2, looser: player1, msg: "scissors beats paper"};
         }
     }
 
     if(weapon1 === "scissors"){
         if(weapon2 === "rock"){
-            io.emit('message', "rock beats scissors");
-            return player2;
+            return {winner: player2, looser: player1, msg: "rock beats scissors"};
         }
         if(weapon2 === "paper"){
-            io.emit('message', "scissors beats paper");
-            return player1;
+            return {winner: player1, looser: player2, msg: "scissors beats paper"};
         }
     }
 }
 
 function resolveDuel() {
     if (player1.weapon && player2.weapon) {
-        io.emit('message', "Player 1 chose " + player1.weapon + " - Player 2 chose " + player2.weapon);
-        io.emit('result', player1, player2);
+        var result = fight(player1, player2);
 
-        var winner = fight(player1, player2);
+        if(result.winner){
+            result.winner.wins = result.winner.wins +1;
+        } // else tie
 
-        if(winner){
-            winner.wins = winner.wins +1;
-            io.emit('score', player1.name + " " + player1.wins + " : " + player2.wins + " " + player2.name);
+        io.emit('result', result);
 
-            var msg = winner.name + " won!";
-            io.emit('message', msg);
-        } else {
-            io.emit('message', "Tie");
-        }
+        round = round + 1;
+        io.emit('score', player1, player2, round);
 
         player1.weapon = player2.weapon = null; // reset weapon choices
     }

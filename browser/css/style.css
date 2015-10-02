@@ -6,7 +6,30 @@ body {
 a {
   color: #00B7FF;
 }
-.front {
+header,
+footer {
+  text-align: center;
+}
+footer {
+  display: flex;
+  flex-direction: column;
+}
+footer div {
+  flex: auto;
+  text-align: center;
+}
+.roundContainer {
+  font-size: 80%;
+}
+#front {
+  display: flex;
+  flex-direction: column;
+}
+#front * {
+  flex: auto;
+  text-align: center;
+}
+#wait {
   text-align: center;
 }
 #game {
@@ -16,15 +39,32 @@ a {
   flex: auto;
   text-align: center;
 }
-#messages {
-  position: absolute;
-  top: 0;
-  left: 50%;
+#result {
+  text-align: center;
 }
-#score {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
+#messages {
+  text-align: center;
+}
+.score {
+  display: flex;
+  color: white;
+  background-color: dimgrey;
+  padding: 10px 20px;
+}
+.score div {
+  flex: auto;
+  text-align: center;
+}
+.rounds {
+  text-align: center;
+  padding: 10px 20px;
+  color: dimgrey;
+  background-color: lightgrey;
+}
+#scoreYou,
+#scoreOpponent {
+  font-size: large;
+  font-weight: bold;
 }
 .hide {
   display: none;

@@ -6,16 +6,20 @@
     <link rel='stylesheet' href="css/style.css" />
 </head>
 <body>
-    <p id="messages">
-
-    </p>
+    <header>
+        <p id="messages"></p>
+    </header>
 
     <div class="container">
+
         <div id="frontView">
             <div id="front">
                 <div>Welcome to</div>
                 <h1>Rock-paper-scissors</h1>
-                <img src='images/Rock-paper-scissors.svg' width='300' height='287'>
+                <div>
+                    <img src='images/Rock-paper-scissors.svg' width='300' height='287'>
+                </div>
+
                 <p>
                     <button id="start">start game</button>
                 </p>
@@ -31,16 +35,27 @@
         </div>
 
         <div id="gameView"  class='hide'>
+            <div class="rounds">
+                <span id="round">0</span> rounds played
+            </div>
+
+            <div class="score">
+                <div>
+                    <span id="scoreYou">0</span>
+                </div>
+                <div>
+                    <span id="scoreOpponent">0</span>
+                </div>
+            </div>
+
             <div id='game'>
                 <div>
                     <h1>You</h1>
                     <p id="weaponYou"></p>
-
-                    <h5>choose weapon</h5>
                     <p>
-                        <button id="rock" type="button">Rock</button>
-                        <button id="paper" type="button">Paper</button>
-                        <button id="scissors" type="button">Scissors</button>
+                        <button id="rock" type="button"><img src='images/rock.png'></button>
+                        <button id="paper" type="button"><img src='images/paper.png'></button>
+                        <button id="scissors" type="button"><img src='images/scissors.png'></button>
                     </p>
                 </div>
                 <div>
@@ -48,10 +63,11 @@
                     <p id="weaponOpponent"></p>
                 </div>
             </div>
+            <div>
+                <h2 id="result"></h2>
+            </div>
         </div>
     </div>
-
-    <p id="score"></p>
 
     <script src="js/socket.io.js"></script>
     <script src="js/app.js"></script>
