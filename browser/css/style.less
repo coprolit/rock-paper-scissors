@@ -23,11 +23,6 @@ footer {
   }
 }
 
-.container {
-  //display: flex;
-  //flex-direction: column;
-}
-
 .roundContainer {
   font-size: 80%;
 }
@@ -52,35 +47,48 @@ footer {
   div {
     flex: auto;
     text-align: center;
+    width: 50%;
+  }
+}
+
+#weaponYou, #weaponOpponent {
+  img {
+    width: 128px;
   }
 }
 
 #result {
+  color: dimgrey;
   text-align: center;
+  font-style: italic;
 }
 
 #messages {
   text-align: center;
 }
 
-.weapon-selector {
+#weapon-selector {
   position: absolute;
   bottom: 0;
   width: 100%;
   text-align: center;
   background-color: orange;
   padding: 10px;
+
+  div {
+    margin-bottom: 5px;
+  }
 }
 
 .score {
   display: flex;
   color: white;
   background-color: dimgrey;
-  padding: 10px 20px;
 
   div {
     flex: auto;
     text-align: center;
+    width: 50%;
   }
 }
 
@@ -91,11 +99,13 @@ footer {
   background-color: lightgrey;
 }
 
-#scoreYou, #scoreOpponent {
-  font-size: large;
-  font-weight: bold;
-}
-
 .hide {
   display: none;
+}
+
+.win {
+  color: green;
+}
+.loose {
+  color: red;
 }

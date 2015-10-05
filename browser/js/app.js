@@ -14,6 +14,9 @@ var scoreYouEl = document.querySelector('#scoreYou');
 var scoreOppEl = document.querySelector('#scoreOpponent');
 var roundEl = document.querySelector('#round');
 var resultEl = document.querySelector('#result');
+var selectorEl = document.querySelector('#weapon-selector');
+var weaponChosenYou = document.querySelector('#weaponYou');
+var weaponChosenOpp = document.querySelector('#weaponOpponent');
 
 var btnStart = document.querySelector('#start');
 btnStart.addEventListener('click', startGame);
@@ -57,6 +60,20 @@ function getImage(weapon) {
 
     return el;
 }
+/*
+function reset(){
+    weaponChosenYou.innerHTML = '';
+    weaponChosenOpp.innerHTML = '';
+    resultEl.innerHTML = '';
+    selectorEl.setAttribute('class', ''); // hide
+}
+*/
+socket.on('reset', function(){
+    weaponChosenYou.innerHTML = '';
+    weaponChosenOpp.innerHTML = '';
+    resultEl.innerHTML = '';
+    selectorEl.setAttribute('class', ''); // hide
+});
 
 socket.on('message', function(msg){
     consoleEl.innerHTML = msg;
@@ -80,11 +97,12 @@ socket.on('start', function(){
 
 socket.on('choice:confirmed', function(weapon){
     if(weapon){ // user You
-        var you = document.querySelector('#weaponYou');
-        you.innerHTML = getImage(weapon);
+        //var you = document.querySelector('#weaponYou');
+        weaponChosenYou.innerHTML = getImage(weapon);
+        selectorEl.setAttribute('class', 'hide'); // hide
     } else { // opponent
-        var opp = document.querySelector('#weaponOpponent');
-        opp.innerHTML = getImage();
+        //var opp = document.querySelector('#weaponOpponent');
+        weaponChosenOpp.innerHTML = getImage();
     }
 
 });
@@ -102,13 +120,14 @@ socket.on('result', function(player1, player2, result, round){
 
     roundEl.innerHTML = round;
 
-    var msg = result.message;
+    var msg = result.msg;
     if(result.winner){
-        msg = msg + result.winner.id === socket.id ? "<h2>You win!</h2>" : "<h2>You loose!</h2>";
+        msg = msg + (result.winner.id === socket.id ? '<h2 class="win">You win!</h2>' : '<h2 class="loose">You loose!</h2>');
     }
 
     setTimeout(function(){
         resultEl.innerHTML = msg;
+        //setTimeout(reset, 3000);
     }, 300);
 });
 /*

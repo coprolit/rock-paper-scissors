@@ -39,14 +39,21 @@ footer div {
 #game div {
   flex: auto;
   text-align: center;
+  width: 50%;
+}
+#weaponYou img,
+#weaponOpponent img {
+  width: 128px;
 }
 #result {
+  color: dimgrey;
   text-align: center;
+  font-style: italic;
 }
 #messages {
   text-align: center;
 }
-.weapon-selector {
+#weapon-selector {
   position: absolute;
   bottom: 0;
   width: 100%;
@@ -54,15 +61,18 @@ footer div {
   background-color: orange;
   padding: 10px;
 }
+#weapon-selector div {
+  margin-bottom: 5px;
+}
 .score {
   display: flex;
   color: white;
   background-color: dimgrey;
-  padding: 10px 20px;
 }
 .score div {
   flex: auto;
   text-align: center;
+  width: 50%;
 }
 .rounds {
   text-align: center;
@@ -70,11 +80,12 @@ footer div {
   color: dimgrey;
   background-color: lightgrey;
 }
-#scoreYou,
-#scoreOpponent {
-  font-size: large;
-  font-weight: bold;
-}
 .hide {
   display: none;
+}
+.win {
+  color: green;
+}
+.loose {
+  color: red;
 }

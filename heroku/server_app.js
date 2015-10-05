@@ -228,11 +228,15 @@ function resolveDuel() {
             result.winner.wins = result.winner.wins +1;
         } // else tie
 
-        //io.emit('result', result);
-
         round = round + 1;
         io.emit('result', player1, player2, result, round);
 
         player1.weapon = player2.weapon = null; // reset weapon choices
+
+        setTimeout(reset, 3000);
     }
+}
+
+function reset(){ // tell connected clients to reset UI for a new round
+    io.emit('reset');
 }
