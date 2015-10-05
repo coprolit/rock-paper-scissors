@@ -65,6 +65,10 @@ footer div {
 #weapon-selector div {
   margin-bottom: 5px;
 }
+#weapon-selector img {
+  background-color: white;
+  border-radius: 50px;
+}
 .score {
   display: flex;
   color: white;

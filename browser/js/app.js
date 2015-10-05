@@ -57,25 +57,32 @@ function getImage(weapon) {
         default:
             el = '<img src="images/help.png" >';
     }
-
     return el;
 }
 
-socket.on('reset', function(){
+function reset(){ // reset UI for next duel
     weaponChosenYou.innerHTML = '';
     weaponChosenOpp.innerHTML = '';
     resultEl.innerHTML = '';
-    selectorEl.setAttribute('class', ''); // hide
+    selectorEl.setAttribute('class', ''); // show
+}
+
+socket.on('reset', function(){
+    reset();
 });
 /*
 socket.on('message', function(msg){
     consoleEl.innerHTML = msg;
 });
 */
-socket.on('mandown', function(){ // opponent disconnected
+socket.on('mandown', function(){ // opponent disconnected, return to start screen
     gameView.setAttribute('class', 'hide'); // hide
-    frontView.setAttribute('class', 'hide'); // hide
-    waitView.setAttribute('class', ''); // show
+    waitView.setAttribute('class', 'hide'); // hide
+    scoreYouEl.innerHTML = '';
+    scoreOppEl.innerHTML = '';
+    roundEl.innerHTML = '';
+    reset();
+    frontView.setAttribute('class', ''); // show
 });
 
 socket.on('waiting', function(name){
