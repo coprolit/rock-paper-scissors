@@ -25,6 +25,8 @@ footer div {
 #front {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  margin-top: 5em;
 }
 #front * {
   flex: auto;
@@ -41,9 +43,8 @@ footer div {
   text-align: center;
   width: 50%;
 }
-#weaponYou img,
 #weaponOpponent img {
-  width: 128px;
+  transform: scaleX(-1);
 }
 #result {
   color: dimgrey;
