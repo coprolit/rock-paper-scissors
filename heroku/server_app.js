@@ -87,9 +87,9 @@ io.on('connection', function (socket) {
             //socket.broadcast.emit('result', name + ' connected'); // broadcast to other users
             //socket.emit('result', 'choose your weapon ' + name);
 
-            socket.on('disconnect', function () {
-                socket.broadcast.emit('mandown'); // broadcast to other users
-                unregisterPlayer(socket.id);
+            socket.on('disconnect', function () { // a client disconnected - reset game state
+                restart();
+                socket.emit('restart'); // broadcast to other users
             });
 
             socket.on('choice', function (val) {
@@ -123,13 +123,11 @@ io.on('connection', function (socket) {
  }];
  */
 var player1 = {
-    name: "PlayerA",
     id: null,
     weapon: null,
     wins: 0
 };
 var player2 = {
-    name: "PlayerB",
     id: null,
     weapon: null,
     wins: 0
@@ -162,6 +160,19 @@ function registerPlayer(id) {
         }
     }); // arr.some() breaks the loop and returns true if callback function returns true - but we have no use for it...
     return name;
+}
+
+function restart(){
+    player1 = {
+        id: null,
+        weapon: null,
+        wins: 0
+    };
+    player2 = {
+        id: null,
+        weapon: null,
+        wins: 0
+    }
 }
 function unregisterPlayer(id) {
     // abuse arr.some() because it's more compact than a for() loop:

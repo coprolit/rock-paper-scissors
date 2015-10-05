@@ -75,7 +75,7 @@ socket.on('message', function(msg){
     consoleEl.innerHTML = msg;
 });
 */
-socket.on('mandown', function(){ // opponent disconnected, return to start screen
+socket.on('restart', function(){ // opponent disconnected, return to start screen
     gameView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', 'hide'); // hide
     scoreYouEl.innerHTML = '';
