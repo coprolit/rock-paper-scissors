@@ -231,7 +231,7 @@ function resolveDuel() {
         //io.emit('result', result);
 
         round = round + 1;
-        io.emit('score', player1, player2, round);
+        io.emit('score', player1, player2, result.msg, round);
 
         player1.weapon = player2.weapon = null; // reset weapon choices
     }

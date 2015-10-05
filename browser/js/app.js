@@ -89,7 +89,7 @@ socket.on('choice:confirmed', function(weapon){
 
 });
 
-socket.on('score', function(player1, player2, round){
+socket.on('score', function(player1, player2, message, round){
     if(player1.id === socket.id){ // you
         scoreYouEl.innerHTML = player1.wins;
         scoreOppEl.innerHTML = player2.wins;
@@ -101,6 +101,10 @@ socket.on('score', function(player1, player2, round){
     }
 
     roundEl.innerHTML = round;
+
+    setTimeout(function(){
+        resultEl.innerHTML = message;
+    }, 300);
 });
 
 socket.on('result', function(result){
