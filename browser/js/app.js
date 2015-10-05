@@ -9,7 +9,7 @@ var frontView = document.querySelector('#frontView');
 var waitView = document.querySelector('#waitView');
 var gameView = document.querySelector('#gameView');
 
-var consoleEl = document.querySelector('#messages');
+//var consoleEl = document.querySelector('#messages');
 var scoreYouEl = document.querySelector('#scoreYou');
 var scoreOppEl = document.querySelector('#scoreOpponent');
 var roundEl = document.querySelector('#round');
@@ -60,25 +60,18 @@ function getImage(weapon) {
 
     return el;
 }
-/*
-function reset(){
-    weaponChosenYou.innerHTML = '';
-    weaponChosenOpp.innerHTML = '';
-    resultEl.innerHTML = '';
-    selectorEl.setAttribute('class', ''); // hide
-}
-*/
+
 socket.on('reset', function(){
     weaponChosenYou.innerHTML = '';
     weaponChosenOpp.innerHTML = '';
     resultEl.innerHTML = '';
     selectorEl.setAttribute('class', ''); // hide
 });
-
+/*
 socket.on('message', function(msg){
     consoleEl.innerHTML = msg;
 });
-
+*/
 socket.on('mandown', function(){ // opponent disconnected
     gameView.setAttribute('class', 'hide'); // hide
     frontView.setAttribute('class', 'hide'); // hide

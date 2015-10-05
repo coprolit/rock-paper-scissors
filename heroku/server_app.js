@@ -233,7 +233,7 @@ function resolveDuel() {
 
         player1.weapon = player2.weapon = null; // reset weapon choices
 
-        setTimeout(reset, 3000);
+        setTimeout(reset, 4000);
     }
 }
 
