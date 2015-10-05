@@ -77,7 +77,7 @@ function onListening() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    console.log("connection", socket.id);
+    //console.log("connection", socket.id);
     // socket represents a client (= an individual user)
 
     socket.on('start', function(){
@@ -228,7 +228,7 @@ function resolveDuel() {
             result.winner.wins = result.winner.wins +1;
         } // else tie
 
-        io.emit('result', result);
+        //io.emit('result', result);
 
         round = round + 1;
         io.emit('score', player1, player2, round);

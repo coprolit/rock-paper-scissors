@@ -62,10 +62,9 @@ socket.on('message', function(msg){
     consoleEl.innerHTML = msg;
 });
 
-socket.on('mandown', function(){
+socket.on('mandown', function(){ // opponent disconnected
     gameView.setAttribute('class', 'hide'); // hide
     frontView.setAttribute('class', 'hide'); // hide
-    //document.querySelector('footer').setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', ''); // show
 });
 
@@ -77,7 +76,6 @@ socket.on('waiting', function(name){
 socket.on('start', function(){
     waitView.setAttribute('class', 'hide'); // hide
     gameView.setAttribute('class', ''); // show
-    //document.querySelector('footer').setAttribute('class', ''); // show
 });
 
 socket.on('choice:confirmed', function(weapon){
@@ -86,7 +84,7 @@ socket.on('choice:confirmed', function(weapon){
         you.innerHTML = getImage(weapon);
     } else { // opponent
         var opp = document.querySelector('#weaponOpponent');
-        opp.innerHTML =  getImage();
+        opp.innerHTML = getImage();
     }
 
 });
@@ -106,12 +104,11 @@ socket.on('score', function(player1, player2, round){
 });
 
 socket.on('result', function(result){
-    //var state = [user1, user2];
     var you = document.querySelector('#weaponYou');
     var opp = document.querySelector('#weaponOpponent');
 
     if(result.winner){
-        if(result.winner.id === socket.id){ // you wins
+        if(result.winner.id === socket.id){ // you win
             you.innerHTML = getImage(result.winner.weapon);
             opp.innerHTML = getImage(result.looser.weapon);
         } else { // opponent wins
