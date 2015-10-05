@@ -84,9 +84,6 @@ io.on('connection', function (socket) {
         var name = registerPlayer(socket.id);
 
         if(name){ // player was successfully registered
-            //socket.broadcast.emit('result', name + ' connected'); // broadcast to other users
-            //socket.emit('result', 'choose your weapon ' + name);
-
             socket.on('disconnect', function () { // a client disconnected - reset game state
                 restart();
                 socket.emit('restart'); // broadcast to other users
@@ -99,7 +96,6 @@ io.on('connection', function (socket) {
             });
 
             socket.emit('waiting', name);
-
         } else {
             socket.emit('message', 'Sorry, game is already full.');
         }
@@ -163,16 +159,8 @@ function registerPlayer(id) {
 }
 
 function restart(){
-    player1 = {
-        id: null,
-        weapon: null,
-        wins: 0
-    };
-    player2 = {
-        id: null,
-        weapon: null,
-        wins: 0
-    }
+    player1.id = player2.id = player1.weapon = player2.weapon = null;
+    player1.wins = player2.wins = 0;
 }
 function unregisterPlayer(id) {
     // abuse arr.some() because it's more compact than a for() loop:
