@@ -2,7 +2,7 @@
  * Created by philippe_simpson on 01/10/15.
  */
 
-var socket = io('http://localhost:8080');
+var socket = io('https://quiet-beyond-3424.herokuapp.com/');//http://localhost:8080');
 
 // views
 var frontView = document.querySelector('#frontView');
