@@ -89,7 +89,7 @@ socket.on('choice:confirmed', function(weapon){
 
 });
 
-socket.on('score', function(player1, player2, message, round){
+socket.on('result', function(player1, player2, result, round){
     if(player1.id === socket.id){ // you
         scoreYouEl.innerHTML = player1.wins;
         scoreOppEl.innerHTML = player2.wins;
@@ -102,11 +102,16 @@ socket.on('score', function(player1, player2, message, round){
 
     roundEl.innerHTML = round;
 
+    var msg = result.message;
+    if(result.winner){
+        msg = msg + result.winner.id === socket.id ? "<h2>You win!</h2>" : "<h2>You loose!</h2>";
+    }
+
     setTimeout(function(){
-        resultEl.innerHTML = message;
+        resultEl.innerHTML = msg;
     }, 300);
 });
-
+/*
 socket.on('result', function(result){
     var you = document.querySelector('#weaponYou');
     var opp = document.querySelector('#weaponOpponent');
@@ -125,3 +130,4 @@ socket.on('result', function(result){
         resultEl.innerHTML = result.msg;
     }, 300);
 });
+*/
