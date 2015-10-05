@@ -77,16 +77,18 @@ function onListening() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    //console.log("connection", socket.id);
+    console.log("connection", socket.id);
     // socket represents a client (= an individual user)
 
     socket.on('start', function(){
-        var name = registerPlayer(socket.id);
+        console.log("on start", socket.id);
+        //var name = registerPlayer(socket.id);
+        var registered = registerPlayer(socket.id);
 
-        if(name){ // player was successfully registered
+        if(registered){ // player was successfully registered
             socket.on('disconnect', function () { // a client disconnected - reset game state
                 restart();
-                socket.emit('restart'); // broadcast to other users
+                socket.broadcast.emit('restart'); // restart clients
             });
 
             socket.on('choice', function (val) {
@@ -95,9 +97,9 @@ io.on('connection', function (socket) {
                 socket.broadcast.emit('choice:confirmed'); // broadcast to opponent
             });
 
-            socket.emit('waiting', name);
+            socket.emit('waiting');
         } else {
-            socket.emit('message', 'Sorry, game is already full.');
+            socket.emit('message', 'Server is full. Try again later.');
         }
     });
 });
@@ -143,22 +145,26 @@ Object.observe(player2, function (changes) {
 });
 
 function onRegistered(){
-    if(player1.id && player2.id) io.emit('start');
+    console.log("onRegistered()", player1.id, player2.id);
+    if(player1.id && player2.id){
+        io.emit('start');
+    }
 }
 function registerPlayer(id) {
-    var name;
+    //var registered = false;
     // abuse arr.some() because it's more compact than a for() loop:
-    players.some(function(element){ // tests whether some element in the array passes the test
+    var registered = players.some(function(element){ // tests whether some element in the array passes the test
         if(element.id === null){
             element.id = id;
-            name = element.name;
-            return true; // passed the test
+            registered = true;
+            return true; // passed the test, abort loop
         }
-    }); // arr.some() breaks the loop and returns true if callback function returns true - but we have no use for it...
-    return name;
+    }); // arr.some() breaks the loop and returns true if callback function returns true, else returns false
+    return registered;
 }
 
 function restart(){
+    console.log("restart()");
     player1.id = player2.id = player1.weapon = player2.weapon = null;
     player1.wins = player2.wins = 0;
 }

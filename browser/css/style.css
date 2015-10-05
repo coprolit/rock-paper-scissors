@@ -53,6 +53,7 @@ footer div {
 }
 #messages {
   text-align: center;
+  color: darkred;
 }
 #weapon-selector {
   position: absolute;
