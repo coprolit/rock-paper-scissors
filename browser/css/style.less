@@ -5,8 +5,24 @@ body {
   margin: 0;
 }
 
-a {
-  color: #00B7FF;
+button {
+    color: #333;
+    background-color: #fff;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    touch-action: manipulation;
+    cursor: pointer;
+    user-select: none;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 header, footer {
@@ -14,13 +30,8 @@ header, footer {
 }
 
 footer {
-  display: flex;
-  flex-direction: column;
-
-  div {
-    flex: auto;
-    text-align: center;
-  }
+  font-size: .8em;
+  color: lightgray;
 }
 
 .roundContainer {
@@ -76,23 +87,28 @@ footer {
   bottom: 0;
   width: 100%;
   text-align: center;
-  background-color: orange;
-  padding: 10px;
+  background-color: whitesmoke;
+  padding: 10px 0;
+  box-shadow: 2px 0 10px rgba(0,0,0,.5);
 
   div {
-    margin-bottom: 5px;
+    margin-bottom: 10px;
   }
 
   img {
     background-color: white;
     border-radius: 50px;
   }
+
+  a {
+    margin: 0 5px;
+  }
 }
 
 .score {
   display: flex;
-  color: white;
-  background-color: dimgrey;
+  //color: white;
+  background-color: whitesmoke;
 
   div {
     flex: auto;
@@ -105,7 +121,7 @@ footer {
   text-align: center;
   padding: 10px 20px;
   color: dimgrey;
-  background-color: lightgrey;
+  //background-color: lightgrey;
 }
 
 .hide {

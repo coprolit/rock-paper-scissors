@@ -168,6 +168,7 @@ function restart(){
     player1.wins = player2.wins = 0;
     round = 0;
 }
+/*
 function unregisterPlayer(id) {
     // abuse arr.some() because it's more compact than a for() loop:
     players.some(function(element){ // tests whether some element in the array passes the test
@@ -180,6 +181,7 @@ function unregisterPlayer(id) {
     player1.wins = player2.wins = 0;
     round = 0;
 }
+*/
 
 function setChoice(id, val) {
     // find player, then assign weapon choice:
