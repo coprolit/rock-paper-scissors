@@ -77,18 +77,17 @@ function onListening() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    console.log("connection", socket.id);
-    // socket represents a client (= an individual user)
+    //console.log("connection", socket.id);
+    // socket represents a client / individual user
 
     socket.on('start', function(){
-        console.log("on start", socket.id);
-        //var name = registerPlayer(socket.id);
+        //console.log("on start", socket.id);
         var registered = registerPlayer(socket.id);
 
         if(registered){ // player was successfully registered
             socket.on('disconnect', function () { // a client disconnected - reset game state
                 restart();
-                socket.broadcast.emit('restart'); // restart clients
+                socket.broadcast.emit('restart'); // restart other clients
             });
 
             socket.on('choice', function (val) {
@@ -145,8 +144,8 @@ Object.observe(player2, function (changes) {
 });
 
 function onRegistered(){
-    console.log("onRegistered()", player1.id, player2.id);
-    if(player1.id && player2.id){
+    //console.log("onRegistered()", player1.id, player2.id);
+    if(player1.id && player2.id){ // both players ready. Let's play
         io.emit('start');
     }
 }
@@ -167,14 +166,13 @@ function restart(){
     //console.log("restart()");
     player1.id = player2.id = player1.weapon = player2.weapon = null;
     player1.wins = player2.wins = 0;
+    round = 0;
 }
 function unregisterPlayer(id) {
     // abuse arr.some() because it's more compact than a for() loop:
     players.some(function(element){ // tests whether some element in the array passes the test
         if(element.id === id){
             element.id = null;
-            //element.wins = 0;
-            //element.name = null;
             return true; // passed the test, break out of the loop
         }
     }); // arr.some() returns true if callback function returns true - but we have no use for it...
@@ -238,7 +236,7 @@ function resolveDuel() {
 
         player1.weapon = player2.weapon = null; // reset weapon choices
 
-        setTimeout(reset, 12000);
+        setTimeout(reset, 12000); // wait and emit reset
     }
 }
 

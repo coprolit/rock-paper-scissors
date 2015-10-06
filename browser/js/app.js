@@ -68,20 +68,9 @@ function reset(){ // reset UI between rounds
     resultEl.innerHTML = '';
     selectorEl.setAttribute('class', ''); // show
 }
-/*
-function countDown(index){
-    resultEl.innerHTML = String(index);
-    if(index < 3){
-        index++;
-        setTimeout(countDown, 500, index);
-    } else {
 
-    }
-}
-*/
 function countDown(){
     return new Promise(function(resolve, reject) {
-        // do a thing, possibly async, then…
         var index = 1;
 
         function iterate(){
