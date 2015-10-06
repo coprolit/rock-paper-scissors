@@ -72,7 +72,7 @@ function reset(){ // reset UI between rounds
 function countDown(){
     return new Promise(function(resolve, reject) {
 
-        var iterator = function*(){ // Generator object
+        var iterator = function*(){ // Generator iterator
             yield "1";
             yield "2";
             yield "3";
@@ -88,7 +88,7 @@ function countDown(){
                 resolve();
             }
         }
-        
+
         iterate();
     });
 }
@@ -103,6 +103,7 @@ socket.on('message', function(msg){
 
 socket.on('restart', function(){ // opponent disconnected, return to start screen
     //console.log('on restart');
+    alert("Opponent fled.");
     gameView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', 'hide'); // hide
     scoreYouEl.innerHTML = 0;
