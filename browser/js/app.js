@@ -3,8 +3,8 @@
  */
 "use strict";
 
-//var socket = io('https://quiet-beyond-3424.herokuapp.com/');
-var socket = io('http://localhost:8080'); // for debugging
+var socket = io('https://quiet-beyond-3424.herokuapp.com/');
+//var socket = io('http://localhost:8080'); // for debugging
 
 // views
 var frontView = document.querySelector('#frontView');
