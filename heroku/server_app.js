@@ -164,7 +164,7 @@ function registerPlayer(id) {
 }
 
 function restart(){
-    console.log("restart()");
+    //console.log("restart()");
     player1.id = player2.id = player1.weapon = player2.weapon = null;
     player1.wins = player2.wins = 0;
 }
@@ -238,7 +238,7 @@ function resolveDuel() {
 
         player1.weapon = player2.weapon = null; // reset weapon choices
 
-        setTimeout(reset, 4000);
+        setTimeout(reset, 12000);
     }
 }
 

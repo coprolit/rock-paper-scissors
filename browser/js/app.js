@@ -1,6 +1,7 @@
 /**
  * Created by philippe_simpson on 01/10/15.
  */
+"use strict";
 
 //var socket = io('https://quiet-beyond-3424.herokuapp.com/');
 var socket = io('http://localhost:8080'); // for debugging
@@ -67,6 +68,34 @@ function reset(){ // reset UI between rounds
     resultEl.innerHTML = '';
     selectorEl.setAttribute('class', ''); // show
 }
+/*
+function countDown(index){
+    resultEl.innerHTML = String(index);
+    if(index < 3){
+        index++;
+        setTimeout(countDown, 500, index);
+    } else {
+
+    }
+}
+*/
+function countDown(){
+    return new Promise(function(resolve, reject) {
+        // do a thing, possibly async, then…
+        var index = 1;
+
+        function iterate(){
+            resultEl.innerHTML = '<h1>' + String(index) + '</h1>';
+            if(index < 4){
+                index++;
+                setTimeout(iterate, 800);
+            } else {
+                resolve();
+            }
+        }
+        iterate();
+    });
+}
 
 socket.on('reset', function(){
     reset();
@@ -110,6 +139,12 @@ socket.on('choice:confirmed', function(weapon){
 });
 
 socket.on('result', function(player1, player2, result, round){
+    countDown().then(function(){
+        showResult(player1,player2,result,round);
+    });
+});
+
+function showResult(player1, player2, result, round){
     if(player1.id === socket.id){ // you
         scoreYouEl.innerHTML = player1.wins;
         scoreOppEl.innerHTML = player2.wins;
@@ -129,5 +164,5 @@ socket.on('result', function(player1, player2, result, round){
 
     setTimeout(function(){
         resultEl.innerHTML = msg;
-    }, 300);
-});
+    }, 1000);
+}
