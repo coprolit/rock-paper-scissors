@@ -71,17 +71,24 @@ function reset(){ // reset UI between rounds
 
 function countDown(){
     return new Promise(function(resolve, reject) {
-        var index = 1;
+
+        var iterator = function*(){ // Generator object
+            yield "1";
+            yield "2";
+            yield "3";
+            yield "throw!";
+        }();
 
         function iterate(){
-            resultEl.innerHTML = '<h1>' + String(index) + '</h1>';
-            if(index < 4){
-                index++;
+            var count = iterator.next();
+            if(!count.done){
+                resultEl.innerHTML = '<h1>' + count.value + '</h1>';
                 setTimeout(iterate, 800);
             } else {
                 resolve();
             }
         }
+        
         iterate();
     });
 }
