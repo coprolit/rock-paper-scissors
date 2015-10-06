@@ -102,7 +102,6 @@ socket.on('message', function(msg){
 });
 
 socket.on('restart', function(){ // opponent disconnected, return to start screen
-    //console.log('on restart');
     alert("Opponent fled.");
     gameView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', 'hide'); // hide

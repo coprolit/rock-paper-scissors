@@ -4,9 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Rock Paper Scissors</title>
+    <script src="https://featuretests.io/rs.js"></script>
     <link rel='stylesheet' href="css/style.css" />
 </head>
 <body>
+<script>
+    // do feature detection:
+    var testResult;
+    window["Reflect.supports"]( "all", function(tests){
+        testResult = tests;
+
+         var txt = "WARNING: Your browser does not support ES6 ";
+         if(!tests.Promise) alert(txt + "promises.");
+         if(!tests.generator) alert(txt + "generators.");
+    });
+</script>
     <div class="container">
 
         <div id="frontView">
