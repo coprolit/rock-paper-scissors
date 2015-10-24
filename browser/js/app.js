@@ -131,7 +131,8 @@ socket.on('waiting', function(sessionID){ // we're ready, let's wait for opponen
     frontView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', ''); // show
     var el = waitView.querySelector('.invite-url');
-    el.innerHTML = "To invite someone to play, give this url: " + window.location + " ?session=" + sessionID;
+    // http://philippesimpson.dk/rock-paper-scissors/
+    el.innerHTML = "To invite someone to play, give this url:<h4>" + window.location.protocol + "//" + window.location.host + window.location.pathname + "?session=" + sessionID + "</h4>";
 });
 
 socket.on('start', function(){ // both clients are ready, let the game begin
