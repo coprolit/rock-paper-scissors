@@ -3,8 +3,9 @@
  */
 "use strict";
 
-var socket = io('https://quiet-beyond-3424.herokuapp.com/');
-//var socket = io('http://localhost:8080'); // for debugging
+//var url = 'http://localhost:8080';
+var url = 'https://quiet-beyond-3424.herokuapp.com/';
+var socket = io(url);
 
 // views
 var frontView = document.querySelector('#frontView');
@@ -33,7 +34,12 @@ btnScissors.addEventListener('click', onScissors);
 function startGame(){
     socket.emit('start', 'Mr. Smith');
 }
-
+/*
+function joinGame(){
+    var sessionID = 1;
+    socket.emit('join', sessionID);
+}
+*/
 function onRock() {
     socket.emit('choice', "rock");
 }
@@ -93,6 +99,13 @@ function countDown(){
     });
 }
 
+socket.on('connect', function(){
+    var session = getUrlVars()["session"];
+    if(session){
+        socket.emit('join', session);
+    }
+});
+
 socket.on('reset', function(){
     reset();
 });
@@ -110,17 +123,19 @@ socket.on('restart', function(){ // opponent disconnected, return to start scree
     roundEl.innerHTML = 0;
     reset();
     frontView.setAttribute('class', ''); // show
+    socket.emit('restart:done');
 });
 
-socket.on('waiting', function(){ // we're ready, let's wait for opponent
-    //console.log('on waiting');
+socket.on('waiting', function(sessionID){ // we're ready, let's wait for opponent
     consoleEl.innerHTML = '';
     frontView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', ''); // show
+    var el = waitView.querySelector('.invite-url');
+    el.innerHTML = "?session=" + sessionID;
 });
 
 socket.on('start', function(){ // both clients are ready, let the game begin
-    //console.log('on start');
+    frontView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', 'hide'); // hide
     gameView.setAttribute('class', ''); // show
 });
@@ -134,31 +149,55 @@ socket.on('choice:confirmed', function(weapon){
     }
 });
 
-socket.on('result', function(player1, player2, result, round){
+socket.on('result', function(data){
     countDown().then(function(){
-        showResult(player1,player2,result,round);
+        showResult(data);
     });
 });
 
-function showResult(player1, player2, result, round){
-    if(player1.id === socket.id){ // you
-        scoreYouEl.innerHTML = player1.wins;
-        scoreOppEl.innerHTML = player2.wins;
-        document.querySelector('#weaponOpponent').innerHTML = getImage(player2.weapon);
+function showResult(result){
+    /*
+    var data = {
+        round: session.round,
+        p1Id: player1.socket.id,
+        p1Wins: player1.wins,
+        p1Weapon: player1.weapon,
+        p2Id: player2.socket.id,
+        p2Wins: player2.wins,
+        p2Weapon: player2.weapon,
+        resultMessage: result.msg,
+        winnerId: result.winner ? result.winner.socket.id : null
+    };
+    */
+
+    if(result.p1Id === socket.id){ // you
+        scoreYouEl.innerHTML = result.p1Wins;
+        scoreOppEl.innerHTML = result.p2Wins;
+        document.querySelector('#weaponOpponent').innerHTML = getImage(result.p2Weapon);
     } else { // opponent
-        scoreOppEl.innerHTML = player1.wins;
-        scoreYouEl.innerHTML = player2.wins;
-        document.querySelector('#weaponOpponent').innerHTML = getImage(player1.weapon);
+        scoreOppEl.innerHTML = result.p1Wins;
+        scoreYouEl.innerHTML = result.p2Wins;
+        document.querySelector('#weaponOpponent').innerHTML = getImage(result.p1Weapon);
     }
 
-    roundEl.innerHTML = round;
+    roundEl.innerHTML = result.round;
 
-    var msg = result.msg;
-    if(result.winner){
-        msg = msg + (result.winner.id === socket.id ? '<h2 class="win">You win!</h2>' : '<h2 class="loose">You loose!</h2>');
+    var msg = result.resultMessage;
+    if(result.winnerId){
+        msg = msg + (result.winnerId === socket.id ? '<h2 class="win">You win!</h2>' : '<h2 class="loose">You loose!</h2>');
     }
 
     setTimeout(function(){
         resultEl.innerHTML = msg;
     }, 1000);
 }
+
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
+        function(m,key,value) {
+            vars[key] = value;
+        });
+    return vars;
+}
+

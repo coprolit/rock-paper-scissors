@@ -1,6 +1,9 @@
 /**
  * Created by philippe_simpson on 01/10/15.
  */
+
+"use strict";
+
 /**
  * Module dependencies.
  */
@@ -23,7 +26,6 @@ var server = http.createServer(handleRequest);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
 server.listen(PORT, function(){
     //Callback triggered when server is successfully listening. Hurray!
     console.log("Server listening on: http://localhost:%s", PORT);
@@ -34,7 +36,6 @@ server.on('listening', onListening);
 /**
  * Event listener for HTTP server "error" event.
  */
-
 function onError(error) {
     if (error.syscall !== 'listen') {
         throw error;
@@ -62,7 +63,6 @@ function onError(error) {
 /**
  * Event listener for HTTP server "listening" event.
  */
-
 function onListening() {
     var addr = server.address();
     var bind = typeof addr === 'string'
@@ -77,91 +77,137 @@ function onListening() {
 var io = require('socket.io')(server);
 
 io.on('connection', function (socket) {
-    //console.log("connection", socket.id);
+    //console.log("on connection", "socket.id", socket.id, sessions.length);
     // socket represents a client / individual user
+    var sessionRef; // reference to session object in sessions array
 
     socket.on('start', function(){
-        //console.log("on start", socket.id);
-        var registered = registerPlayer(socket.id);
-
-        if(registered){ // player was successfully registered
-            socket.on('disconnect', function () { // a client disconnected - reset game state
-                restart();
-                socket.broadcast.emit('restart'); // restart other clients
-            });
-
-            socket.on('choice', function (val) {
-                setChoice(socket.id, val);
-                socket.emit('choice:confirmed', val);
-                socket.broadcast.emit('choice:confirmed'); // broadcast to opponent
-            });
-
-            socket.emit('waiting');
+        if(sessionRef) { // we somehow already have a session stored
+            //console.log("on start", socket.id, "session id:", sessionRef.id);
+            socket.emit('message', 'Something went wrong. Try again.');
         } else {
-            socket.emit('message', 'Server is full. Try again later.');
+            sessionRef = createSession(); // store a reference to session object for future use
+            createPlayer(socket, sessionRef);
+            //console.log("on start", socket.id, "session id:", sessionRef.id);
+            socket.emit('waiting', sessionRef.id);
+            //console.log("on start waiting", socket.id, "session id:", sessionRef.id);
         }
+    });
+
+    socket.on('join', function(sessionID){
+        //console.log("on join", socket.id, "session:", sessionID);
+        if(sessionRef) { // we somehow already have a session stored
+            socket.emit('message', 'Something went wrong. Try again.');
+        } else {
+            sessionRef = getSession(parseInt(sessionID)); // store a reference to session object for future use
+
+            if(sessionRef && sessionRef.players.length === 1){
+                createPlayer(socket, sessionRef);
+
+                sessionRef.players.forEach(function(element){
+                    element.socket.emit('start');
+                });
+            } else {
+                sessionRef = null; // break reference to session object
+                socket.emit('message', 'Invalid game.');
+            }
+        }
+    });
+
+    socket.on('disconnect', function () { // a client disconnected - reset game state
+        //console.log("on disconnect", socket.id);
+        if(sessionRef) {
+            var otherPlayer = sessionRef.players.find(function(element) {
+                return (element.socket.id !== socket.id);
+            });
+            if(otherPlayer) otherPlayer.socket.emit('restart'); // restart other player
+
+            closeSession(sessionRef);
+        }
+    });
+
+    socket.on('choice', function (val) {
+        //console.log("on choice", socket.id, "session:", sessionRef.id, val);
+        setChoice(sessionRef, socket, val);
+        socket.emit('choice:confirmed', val);
+
+        var otherPlayer = sessionRef.players.find(function(element) {
+            //console.log("setChoice", element.socket.id, socket.id);
+            return (element.socket.id !== socket.id);
+        });
+        otherPlayer.socket.emit('choice:confirmed');
+    });
+
+    socket.on('restart:done', function() {
+        sessionRef = null; // break reference to session object
+        //console.log("on restart done", sessions);
     });
 });
 
 /**
  * Game Logic
  */
-var player1 = {
-    id: null,
-    weapon: null,
-    wins: 0
-};
-var player2 = {
-    id: null,
-    weapon: null,
-    wins: 0
-};
+var sessions = [];
+var sessionIDCounter = 0;
 
-var players = [player1, player2];
-
-var round = 0;
-
-Object.observe(player1, function (changes) {
-    if (changes[0].name === 'weapon') resolveDuel();
-    if (changes[0].name === 'id') onRegistered();
-});
-Object.observe(player2, function (changes) {
-    if (changes[0].name === 'weapon') resolveDuel();
-    if (changes[0].name === 'id') onRegistered();
-});
-
-function onRegistered(){
-    //console.log("onRegistered()", player1.id, player2.id);
-    if(player1.id && player2.id){ // both players ready. Let's play
-        io.emit('start');
-    }
-}
-function registerPlayer(id) {
-    //var registered = false;
-    // abuse arr.some() because it's more compact than a for() loop:
-    var registered = players.some(function(element){ // tests whether some element in the array passes the test
-        if(element.id === null){
-            element.id = id;
-            registered = true;
-            return true; // passed the test, abort loop
-        }
-    }); // arr.some() breaks the loop and returns true if callback function returns true, else returns false
-    return registered;
+function createSession(){
+    sessionIDCounter++;
+    var newSession = {
+        id: sessionIDCounter,
+        round: 0,
+        players: []
+    };
+    sessions.push(newSession);
+    console.log("session created", newSession.id);
+    return sessions[sessions.length - 1];
 }
 
-function restart(){
-    //console.log("restart()");
-    player1.id = player2.id = player1.weapon = player2.weapon = null;
-    player1.wins = player2.wins = 0;
-    round = 0;
-}
-
-function setChoice(id, val) {
-    // find player, then assign weapon choice:
-    players.forEach(function(element){
-        if(element.id === id) element.weapon = val;
+function getSession(sessionID){
+    // search for session ID in stored sessions
+    var index = sessions.findIndex(function(element){
+        //console.log("getSession() find", element.id, sessionID);
+        return (element.id === sessionID);
     });
+    return sessions[index];
 }
+
+function closeSession(session){
+    // delete session and players of session
+    var index = sessions.findIndex(function(element) {
+        return (element.id === session.id);
+    });
+
+    if(index > -1){
+        //console.log("closeSession() deleting session", sessions[index]);
+        sessions.splice(index, 1);
+    }
+    //session = undefined; // break reference to object
+    //console.log("done", sessions[index], session);
+}
+
+function createPlayer(socket, session){
+    var player = {
+        weapon: null,
+        wins: 0,
+        socket: socket
+    };
+
+    session.players.push(player);
+    return player;
+}
+
+function setChoice(session, socket, val) {
+    //console.log("setChoice", session, socket.id, val);
+    // find player, then assign weapon choice:
+    var player = session.players.find(function(element) {
+        //console.log("setChoice", element.socket.id, socket.id);
+        return (element.socket.id === socket.id);
+    });
+    player.weapon = val;
+    //console.log("setChoice()", socket,id, player.weapon);
+    resolveDuel(session);
+}
+
 function fight(player1, player2){
     var weapon1 = player1.weapon,
         weapon2 = player2.weapon;
@@ -198,7 +244,11 @@ function fight(player1, player2){
     }
 }
 
-function resolveDuel() {
+function resolveDuel(session) {
+    // get both players
+    var player1 = session.players[0],
+        player2 = session.players[1];
+
     if (player1.weapon && player2.weapon) {
         var result = fight(player1, player2);
 
@@ -206,15 +256,36 @@ function resolveDuel() {
             result.winner.wins = result.winner.wins +1;
         } // else tie
 
-        round = round + 1;
-        io.emit('result', player1, player2, result, round);
+        session.round = session.round + 1;
+
+        session.players.forEach(function(element){
+            // Try sending the object as a whole:
+            var data = {
+                round: session.round,
+                p1Id: player1.socket.id,
+                p1Wins: player1.wins,
+                p1Weapon: player1.weapon,
+                p2Id: player2.socket.id,
+                p2Wins: player2.wins,
+                p2Weapon: player2.weapon,
+                resultMessage: result.msg,
+                winnerId: result.winner ? result.winner.socket.id : null
+            };
+            element.socket.emit('result', data /*player1, player2, result, session.round*/);
+        });
 
         player1.weapon = player2.weapon = null; // reset weapon choices
 
-        setTimeout(reset, 10000); // wait and emit reset
+        // wait and emit reset
+        setTimeout(function() {
+            reset(session);
+        }, 8000)
     }
 }
 
-function reset(){ // tell connected clients to reset UI for a new round
-    io.emit('reset');
+function reset(session){ // tell connected clients to reset UI for a new round
+    session.players.forEach(function(element){
+        element.socket.emit('reset');
+    });
+    //io.emit('reset');
 }
