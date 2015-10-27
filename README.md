@@ -1,10 +1,10 @@
 # rock-paper-scissors
 A basic implementation of a real-time, browser-based rock-paper-scissors game engine.
 
-Utilising Node.js, Socket.io and a few ES6 features (Promise, generator and Object.Observe).
+Utilising Node.js, Socket.io and a few ES6 features (e.g. Promise, generator).
 
 ###### Disclaimer
-It's just a personal side project; fully functional, but rudimentary.
+This is a pet project (I wanted to tinker with real-time and fullstack Javascript). The game is fully functional, but rudimentary.
 
 ### App Architecture
 

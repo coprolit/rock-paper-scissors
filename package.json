@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./heroku/server_app.js"
+    "start": "node ./server/server_app.js"
   },
   "dependencies": {
     "socket.io": "^1.3.7"
