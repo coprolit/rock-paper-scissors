@@ -22,7 +22,7 @@ var weaponChosenYou = document.querySelector('#weaponYou');
 var weaponChosenOpp = document.querySelector('#weaponOpponent');
 
 var btnStart = document.querySelector('#start');
-btnStart.addEventListener('click', startGame);
+btnStart.addEventListener('click', createGame);
 
 var btnRock = document.querySelector('#rock');
 btnRock.addEventListener('click', onRock);
@@ -31,15 +31,10 @@ btnPaper.addEventListener('click', onPaper);
 var btnScissors = document.querySelector('#scissors');
 btnScissors.addEventListener('click', onScissors);
 
-function startGame(){
-    socket.emit('start', 'Mr. Smith');
+function createGame(){
+    socket.emit('create');
 }
-/*
-function joinGame(){
-    var sessionID = 1;
-    socket.emit('join', sessionID);
-}
-*/
+
 function onRock() {
     socket.emit('choice', "rock");
 }
@@ -101,7 +96,7 @@ function countDown(){
 
 socket.on('connect', function(){
     var session = getUrlVars()["session"];
-    if(session){
+    if(session){ // we have been invited to a game, let's join it.
         socket.emit('join', session);
     }
 });
@@ -131,8 +126,7 @@ socket.on('waiting', function(sessionID){ // we're ready, let's wait for opponen
     frontView.setAttribute('class', 'hide'); // hide
     waitView.setAttribute('class', ''); // show
     var el = waitView.querySelector('.invite-url');
-    // http://philippesimpson.dk/rock-paper-scissors/
-    el.innerHTML = "To invite someone to play, give this url:<h4>" + window.location.protocol + "//" + window.location.host + window.location.pathname + "?session=" + sessionID + "</h4>";
+    el.innerHTML = "To invite someone to play, share this url:<h4>" + window.location.protocol + "//" + window.location.host + window.location.pathname + "?session=" + sessionID + "</h4>";
 });
 
 socket.on('start', function(){ // both clients are ready, let the game begin
@@ -158,7 +152,8 @@ socket.on('result', function(data){
 
 function showResult(result){
     /*
-    var data = {
+    Expected result data format:
+    {
         round: session.round,
         p1Id: player1.socket.id,
         p1Wins: player1.wins,
